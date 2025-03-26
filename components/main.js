@@ -31,9 +31,11 @@ export default function Header() {
     address = document.querySelector("#contractAddress").value;
     const chain = EvmChain.ETHEREUM;
 
-    await Moralis.start({
-      apiKey: process.env.NEXT_PUBLIC_MORALIS_API_KEY,
-    });
+    if (!Moralis.Core.isStarted) {
+      await Moralis.start({
+        apiKey: process.env.NEXT_PUBLIC_MORALIS_API_KEY,
+      });
+    }
   
     const response = await Moralis.EvmApi.token.getTokenPrice({
       address,
