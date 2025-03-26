@@ -10,11 +10,6 @@ export default function Header() {
   const [chainValue, setChainValue] = useState("");
   let address;
 
-  const valueOptions = [
-    { value: "eth", label: "Ethereum" },
-    { value: "goerli", label: "Goerli" },
-  ];
-
   const customStyles = {
     option: (provided) => ({
       ...provided,
@@ -29,23 +24,48 @@ export default function Header() {
 
   const handleSubmit = async () => {
     address = document.querySelector("#contractAddress").value;
-    const chain = EvmChain.ETHEREUM;
-
+    const chains = [
+      "0x1",        // Ethereum
+      "0x38",       // Binance Smart Chain (BSC)
+      "0x89",       // Polygon
+      "0xa86a",     // Avalanche
+      "0xa4b1",     // Arbitrum
+      "0x2105",     // Base
+      "0xa",        // Optimism
+      "0xe708",     // Linea
+    ];
     if (!Moralis.Core.isStarted) {
       await Moralis.start({
         apiKey: process.env.NEXT_PUBLIC_MORALIS_API_KEY,
       });
     }
-  
-    const response = await Moralis.EvmApi.token.getTokenPrice({
-      address,
-      chain,
-    });
 
-    setResult(`$ ${response.toJSON().usdPrice}`);
-    setShowResult(true);
-    setChainValue("");
-    document.querySelector("#contractAddress").value = "";
+    if (address.startsWith("0x")) {
+      for (let chain of chains) {
+        const response = await Moralis.EvmApi.token.getTokenPrice({
+          address,
+          chain,
+        });
+        if (response.toJSON().usdPrice) {
+          setResult(`$ ${response.toJSON().usdPrice}`);
+          setShowResult(true);
+          setChainValue("");
+          document.querySelector("#contractAddress").value = "";
+          break;
+        }
+      }
+    } else {
+      const response2 = await Moralis.SolApi.token.getTokenPrice({
+        "network": "mainnet",
+        address,
+      });
+      if (response2.toJSON().usdPrice) {
+        setResult(`$ ${response2.toJSON().usdPrice}`);
+        setShowResult(true);
+        setChainValue("");
+        document.querySelector("#contractAddress").value = "";
+      }
+    }
   };
 
   return (
@@ -66,16 +86,6 @@ export default function Header() {
           name="contractAddress"
           maxLength="120"
           required
-        />
-        <label className={styles.label} htmlFor="contractAddress">
-          Select Chain
-        </label>
-        <Select
-          styles={customStyles}
-          options={valueOptions}
-          value={chainValue}
-          instanceId="long-value-select"
-          onChange={changeHandler}
         />
       </form>
       <button className={styles.form_btn} onClick={handleSubmit}>
