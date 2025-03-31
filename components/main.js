@@ -8,7 +8,6 @@ export default function Header() {
   const [showResult, setShowResult] = useState(false);
   const [result, setResult] = useState("");
   const [chainValue, setChainValue] = useState("");
-  let address;
 
   const customStyles = {
     option: (provided) => ({
@@ -23,49 +22,34 @@ export default function Header() {
   };
 
   const handleSubmit = async () => {
-    address = document.querySelector("#contractAddress").value;
-    const chains = [
-      "0x1",        // Ethereum
-      "0x38",       // Binance Smart Chain (BSC)
-      "0x89",       // Polygon
-      "0xa86a",     // Avalanche
-      "0xa4b1",     // Arbitrum
-      "0x2105",     // Base
-      "0xa",        // Optimism
-      "0xe708",     // Linea
-    ];
-    if (!Moralis.Core.isStarted) {
-      await Moralis.start({
-        apiKey: process.env.NEXT_PUBLIC_MORALIS_API_KEY,
-      });
+    const token_address = document.querySelector("#contractAddress").value;
+    if (!token_address) {
+      setResult("Please enter a token address.");
+      return;
     }
 
-    if (address.startsWith("0x")) {
-      for (let chain of chains) {
-        const response = await Moralis.EvmApi.token.getTokenPrice({
-          address,
-          chain,
-        });
-        if (response.toJSON().usdPrice) {
-          setResult(`$ ${response.toJSON().usdPrice}`);
-          setShowResult(true);
-          setChainValue("");
-          document.querySelector("#contractAddress").value = "";
-          break;
-        }
-      }
-    } else {
-      const response2 = await Moralis.SolApi.token.getTokenPrice({
-        "network": "mainnet",
-        address,
+    try {
+      const response = await fetch("/api/getprice", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ address: token_address }),
       });
-      if (response2.toJSON().usdPrice) {
-        setResult(`$ ${response2.toJSON().usdPrice}`);
-        setShowResult(true);
-        setChainValue("");
-        document.querySelector("#contractAddress").value = "";
+      console.log(response);
+      if (!response.ok) {
+        throw new Error("Fetch Post Error");
       }
+      const json = await response.json();
+      console.log(json);
+      setResult(`$ ${json.price}`);
+      setShowResult(true);
+      setChainValue("");
+      document.querySelector("#contractAddress").value = "";
+    } catch (error) {
+      console.error("Error fetching token price:", error);
     }
+
   };
 
   return (
@@ -77,16 +61,19 @@ export default function Header() {
         action="#"
       >
         <label className={styles.label} htmlFor="contractAddress">
-          Add ERC20 Contract Address
+          Add Any Contract Address in any of these chains: Ethereum, Bsc, Polygon, Avalanche, Arbitrum, Base, Optimism, Linea, Solana
         </label>
         <input
           className={styles.contractAddress}
           type="text"
           id="contractAddress"
           name="contractAddress"
+          placeholder="e.g. 0x6982508145454ce325ddbe47a25d4ec3d2311933"
           maxLength="120"
           required
         />
+          <div className={styles.label}>
+          Hint: You can get a token address on CoinMarketCap.com or similar website.</div>
       </form>
       <button className={styles.form_btn} onClick={handleSubmit}>
         Submit
