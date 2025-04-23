@@ -1,3 +1,4 @@
+/*
 import Head from "next/head";
 import styles from "../styles/Home.module.css";
 
@@ -18,5 +19,98 @@ export default function Home() {
         <Main />
       </main>
     </section>
+  );
+}
+*/
+
+
+
+
+import { useState } from "react";
+import styles from "../styles/landing.module.css";
+import Header from "../components/header";
+import Image from "next/image";
+import btcImg from "../public/assets/BTC_img.png";
+import btcEllipse from "../public/assets/Ellipse 8.png";
+
+
+export default function Home() {
+  const [showResult, setShowResult] = useState(false);
+  const [result, setResult] = useState("");
+
+  const handleSubmit = async () => {
+    const token_address = document.querySelector("#contractAddress").value;
+    if (!token_address) {
+      setResult("Please enter a token address.");
+      setShowResult(true);
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/getprice", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ address: token_address }),
+      });
+
+      if (!response.ok) throw new Error("Fetch Post Error");
+
+      const json = await response.json();
+      setResult(`$ ${json.price}`);
+      setShowResult(true);
+      document.querySelector("#contractAddress").value = "";
+    } catch (error) {
+      console.error("Error fetching token price:", error);
+      setResult("Failed to fetch token price.");
+      setShowResult(true);
+    }
+  };
+
+  return (
+    <main className={styles.wrapper}>
+      <Header />
+
+      {/* Hero section */}
+      <section className={styles.hero}>
+        <h1>Check the price for any Contract Address in any of these chains: <br />Ethereum, Bsc, Polygon, Avalanche, Arbitrum, Base, Optimism, Linea, Solana.</h1>
+
+      </section>
+
+
+      {/* Token price checker */}
+      <section className={styles.tokenPriceSection}>
+
+        <h2>Enter Token Contract Address to get the price</h2>
+        <input
+          id="contractAddress"
+          className={styles.tokenInput}
+          type="text"
+          placeholder="e.g. 0x6982508145454ce325ddbe47a25d4ec3d2311933"
+        />
+        <button onClick={handleSubmit} className={styles.primaryBtn}>
+          Get Price
+        </button>
+
+        {showResult && (
+          <div className={styles.tokenPriceBox}>
+            <span>{result}</span>
+          </div>
+        )}
+      </section>
+      <div className={styles.imageWrapper}>
+        <Image
+          src={btcEllipse}
+          alt="ellipse"
+          className={styles.baseImage}
+        />
+        <Image
+          src={btcImg}
+          alt="BTC img"
+          className={styles.overlayImage}
+        />
+      </div>
+    </main>
   );
 }
