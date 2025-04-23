@@ -1,30 +1,18 @@
 import { useState } from "react";
 const Moralis = require('moralis').default;
 const { EvmChain } = require('@moralisweb3/common-evm-utils');
-import Select from "react-select";
 import styles from "../styles/Home.module.css";
 
 export default function Header() {
+
   const [showResult, setShowResult] = useState(false);
   const [result, setResult] = useState("");
-  const [chainValue, setChainValue] = useState("");
-
-  const customStyles = {
-    option: (provided) => ({
-      ...provided,
-      color: "#000000",
-      backgroundColor: "#ffffff",
-    }),
-  };
-
-  const changeHandler = (chainValue) => {
-    setChainValue(chainValue);
-  };
 
   const handleSubmit = async () => {
     const token_address = document.querySelector("#contractAddress").value;
     if (!token_address) {
       setResult("Please enter a token address.");
+      setShowResult(true);
       return;
     }
 
@@ -36,20 +24,18 @@ export default function Header() {
         },
         body: JSON.stringify({ address: token_address }),
       });
-      console.log(response);
-      if (!response.ok) {
-        throw new Error("Fetch Post Error");
-      }
+
+      if (!response.ok) throw new Error("Fetch Post Error");
+
       const json = await response.json();
-      console.log(json);
       setResult(`$ ${json.price}`);
       setShowResult(true);
-      setChainValue("");
       document.querySelector("#contractAddress").value = "";
     } catch (error) {
       console.error("Error fetching token price:", error);
+      setResult("Failed to fetch token price.");
+      setShowResult(true);
     }
-
   };
 
   return (
@@ -73,7 +59,7 @@ export default function Header() {
           required
         />
           <div className={styles.label}>
-          Hint: You can get a token address on CoinMarketCap.com or similar website.</div>
+          Hint: You can get a token address on <a href="https://www.CoinMarketCap.com">CoinMarketCap.com</a> or similar website.</div>
       </form>
       <button className={styles.form_btn} onClick={handleSubmit}>
         Submit

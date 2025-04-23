@@ -42,6 +42,14 @@
   color: #ffffff;
 }
 
+.label a {
+  color: #00aeff;
+}
+
+.label a:hover {
+  color: #008cff;
+}
+
 .form_btn {
   width: 40vw;
   height: 3rem;
