@@ -1,22 +1,30 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 const Moralis = require('moralis').default;
-const { EvmChain } = require('@moralisweb3/common-evm-utils');
 import styles from "../styles/Home.module.css";
 
-export default function Header() {
-
+export default function Main() {
   const [showResult, setShowResult] = useState(false);
   const [result, setResult] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
-    const token_address = document.querySelector("#contractAddress").value;
-    if (!token_address) {
-      setResult("Please enter a token address.");
-      setShowResult(true);
-      return;
-    }
-
+    setLoading(true);
+    const token_address = document.querySelector("#contractAddress").value.trim();
+    const symbol = document.querySelector("#contractSymbol").value.trim().toUpperCase();
     try {
+      if (symbol && symbol.length <= 10) {
+        const resp = await fetch(`https://cryptoprices.cc/${symbol}`);
+        const data = await resp.json();
+        if (data) {
+          setResult(`$ ${data}`);
+          setShowResult(true);
+          setLoading(false);
+          document.querySelector("#contractAddress").value = "";
+          document.querySelector("#contractSymbol").value = "";
+          return;
+        }
+      }
+
       const response = await fetch("/api/getprice", {
         method: "POST",
         headers: {
@@ -36,16 +44,13 @@ export default function Header() {
       setResult("Failed to fetch token price.");
       setShowResult(true);
     }
+
+    setLoading(false);
   };
 
   return (
     <section className={styles.main}>
-      <form
-        className={styles.getTokenForm}
-        name="create-profile-form"
-        method="POST"
-        action="#"
-      >
+      <form className={styles.getTokenForm}>
         <label className={styles.label} htmlFor="contractAddress">
           Add Any Contract Address in any of these chains: Ethereum, Bsc, Polygon, Avalanche, Arbitrum, Base, Optimism, Linea, Solana
         </label>
@@ -53,17 +58,26 @@ export default function Header() {
           className={styles.contractAddress}
           type="text"
           id="contractAddress"
-          name="contractAddress"
-          placeholder="e.g. 0x6982508145454ce325ddbe47a25d4ec3d2311933"
-          maxLength="120"
-          required
+          placeholder="e.g. 0x2260fac5e5542a773aa44fbcfedf7c193bc2c599"
         />
-          <div className={styles.label}>
+
+        <label className={styles.label} htmlFor="contractSymbol">
+          Or Token Symbol (e.g., BTC, ETH, PEPE)
+        </label>
+        <input
+          className={styles.contractAddress}
+          type="text"
+          id="contractSymbol"
+          placeholder="e.g. btc"
+        />
+        <div className={styles.label}>
           Hint: You can get a token address on <a href="https://www.CoinMarketCap.com">CoinMarketCap.com</a> or similar website.</div>
       </form>
+
       <button className={styles.form_btn} onClick={handleSubmit}>
-        Submit
+        {loading ? "Loading..." : "Get Price"}
       </button>
+
       <section className={styles.result}>
         {showResult && <p>{result}</p>}
       </section>
