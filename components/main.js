@@ -9,19 +9,28 @@ import btcImg from "../public/assets/BTC_img.png";
 import btcEllipse from "../public/assets/Ellipse 8.png";
 
 export default function Header() {
-
   const [showResult, setShowResult] = useState(false);
   const [result, setResult] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
-    const token_address = document.querySelector("#contractAddress").value;
-    if (!token_address) {
-      setResult("Please enter a token address.");
-      setShowResult(true);
-      return;
-    }
-
+    setLoading(true);
+    const token_address = document.querySelector("#contractAddress").value.trim();
+    const symbol = document.querySelector("#contractSymbol").value.trim().toUpperCase();
     try {
+      if (symbol && symbol.length <= 10) {
+        const resp = await fetch(`https://cryptoprices.cc/${symbol}`);
+        const data = await resp.json();
+        if (data) {
+          setResult(`$ ${data}`);
+          setShowResult(true);
+          setLoading(false);
+          document.querySelector("#contractAddress").value = "";
+          document.querySelector("#contractSymbol").value = "";
+          return;
+        }
+      }
+
       const response = await fetch("/api/getprice", {
         method: "POST",
         headers: {
@@ -41,6 +50,8 @@ export default function Header() {
       setResult("Failed to fetch token price.");
       setShowResult(true);
     }
+
+    setLoading(false);
   };
 
   return (
@@ -56,12 +67,19 @@ export default function Header() {
       {/* Token price checker */}
       <section className={styles.tokenPriceSection}>
 
-        <h2>Enter Token Contract Address to get the price</h2>
+        <h2>Enter Token Contract Address to get the price:</h2>
         <input
           id="contractAddress"
           className={styles.tokenInput}
           type="text"
           placeholder="e.g. 0x6982508145454ce325ddbe47a25d4ec3d2311933"
+        />
+        <h2>Or Token Symbol to get the price:</h2>
+        <input
+          id="contractSymbol"
+          className={styles.tokenInput}
+          type="text"
+          placeholder="e.g. btc"
         />
         <button onClick={handleSubmit} className={styles.primaryBtn}>
           Get Price
