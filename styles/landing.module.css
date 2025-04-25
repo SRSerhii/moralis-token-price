@@ -47,8 +47,9 @@
 }
 
 .hero {
-  margin-top: 2rem;
+  margin-top: 1rem;
   text-align: center;
+  padding: 1rem 2rem;
 }
 
 .hero h1 {
@@ -94,122 +95,12 @@
   cursor: pointer;
 }
 
-.buySell {
-  display: flex;
-  justify-content: center;
-  gap: 3rem;
-  margin-top: 5rem;
-  flex-wrap: wrap;
-}
-
-.tradeCard {
-  background-color: #1C1D2F;
-  padding: 2rem;
-  border-radius: 1rem;
-  width: 250px;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  box-shadow: 0 4px 15px rgba(0, 255, 163, 0.15);
-}
-
-.tradeCard h2 {
-  margin: 0;
-  color: #00FFA3;
-}
-
-.tradeCard input,
-.tradeCard select {
-  padding: 0.6rem;
-  border-radius: 5px;
-  border: none;
-  outline: none;
-  font-size: 1rem;
-}
-
-.tradeCard button {
-  background-color: #00FFA3;
-  color: black;
-  font-weight: bold;
-  padding: 0.6rem;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
 .tokenResult {
   margin-top: 1rem;
   color: #ffffff;
   font-size: 1.2rem;
 }
 
-.hero {
-  text-align: center;
-  padding: 4rem 2rem;
-}
-
-.hero h1 {
-  font-size: 2rem;
-  color: white;
-  margin-bottom: 1rem;
-}
-
-.buttons {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-}
-
-.secondaryBtn {
-  background-color: transparent;
-  border: 1px solid #00FFA3;
-  color: #00FFA3;
-}
-
-.buySell {
-  display: flex;
-  justify-content: center;
-  gap: 3rem;
-  margin-top: 5rem;
-  flex-wrap: wrap;
-}
-
-.tradeCard {
-  background-color: #1C1D2F;
-  padding: 2rem;
-  border-radius: 1rem;
-  width: 250px;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  box-shadow: 0 4px 15px rgba(0, 255, 163, 0.15);
-}
-
-.tradeCard h2 {
-  margin: 0;
-  color: #00FFA3;
-}
-
-.tradeCard input,
-.tradeCard select {
-  padding: 0.6rem;
-  border-radius: 5px;
-  border: none;
-  outline: none;
-  font-size: 1rem;
-}
-
-.tradeCard button {
-  background-color: #00FFA3;
-  color: black;
-  font-weight: bold;
-  padding: 0.6rem;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-/* Token price checker section */
 .tokenPriceSection {
   margin-top: 1rem;
   text-align: center;
@@ -303,7 +194,7 @@
   .menuToggle {
     display: block;
     position: absolute;
-    top: 0.5rem;
+    top: 1rem;
     right: 1rem;
   }
 
@@ -317,7 +208,7 @@
     padding: 1rem;
     width: 100%;
     align-items: center;
-    z-index: 999;
+    z-index: 1000;
   }
 
   .show {
@@ -325,6 +216,8 @@
   }
   .navbar {
     justify-content: space-between;
+    position: relative;
+    z-index: 1001;
   }
 }
 
